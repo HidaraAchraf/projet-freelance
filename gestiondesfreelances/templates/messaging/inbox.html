@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Boîte de réception{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="mb-4">Boîte de réception 
+            {% if unread_count > 0 %}
+            <span class="badge bg-danger">{{ unread_count }}</span>
+            {% endif %}
+        </h1>
+        
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Conversations</h5>
+                    <a href="{% url 'messaging:new_conversation' %}" class="btn btn-primary btn-sm">
+                        Nouvelle conversation
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                {% if conversations %}
+                <div class="list-group list-group-flush">
+                    {% for conversation in conversations %}
+                    <a href="{% url 'messaging:conversation' conversation.id %}" 
+                       class="list-group-item list-group-item-action {% if not conversation.messages.last.is_read and conversation.messages.last.sender != request.user %}list-group-item-info{% endif %}">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">
+                                {% for participant in conversation.participants.all %}
+                                    {% if participant != request.user %}
+                                        {{ participant.get_full_name|default:participant.username }}
+                                    {% endif %}
+                                {% endfor %}
+                                {% if conversation.project %}
+                                <small class="text-muted">({{ conversation.project.title }})</small>
+                                {% endif %}
+                            </h6>
+                            <small>{{ conversation.updated_at|timesince }}</small>
+                        </div>
+                        <p class="mb-1">
+                            {% if conversation.messages.last.sender == request.user %}
+                            <strong>Vous:</strong> 
+                            {% endif %}
+                            {{ conversation.messages.last.content|truncatechars:50 }}
+                        </p>
+                        {% if not conversation.messages.last.is_read and conversation.messages.last.sender != request.user %}
+                        <span class="badge bg-primary">Nouveau</span>
+                        {% endif %}
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="p-4 text-center">
+                    <p class="text-muted">Vous n'avez aucune conversation.</p>
+                    <a href="{% url 'messaging:new_conversation' %}" class="btn btn-primary">
+                        Commencer une conversation
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

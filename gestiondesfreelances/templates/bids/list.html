@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Mes offres{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="mb-4">
+            {% if request.user.user_type == 'FL' %}Mes offres{% else %}Offres reçues{% endif %}
+        </h1>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Liste des offres</h5>
+            </div>
+            <div class="card-body">
+                {% if bids %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Projet</th>
+                                {% if request.user.user_type == 'CL' %}
+                                <th>Freelance</th>
+                                {% endif %}
+                                <th>Montant</th>
+                                <th>Délai</th>
+                                <th>Statut</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for bid in bids %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'projects:detail' bid.project.id %}">
+                                        {{ bid.project.title|truncatechars:30 }}
+                                    </a>
+                                </td>
+                                {% if request.user.user_type == 'CL' %}
+                                <td>
+                                    <a href="#">
+                                        {{ bid.freelancer.get_full_name|default:bid.freelancer.username }}
+                                    </a>
+                                </td>
+                                {% endif %}
+                                <td>{{ bid.amount }} €</td>
+                                <td>{{ bid.delivery_time }} jours</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if bid.status == 'AC' %}bg-success
+                                        {% elif bid.status == 'PE' %}bg-warning
+                                        {% else %}bg-secondary{% endif %}">
+                                        {{ bid.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>{{ bid.created_at|date:"d/m/Y" }}</td>
+                                <td>
+                                    <a href="{% url 'bids:detail' bid.id %}" class="btn btn-sm btn-outline-primary">
+                                        Détails
+                                    </a>
+                                    {% if request.user.user_type == 'FL' and bid.status == 'PE' %}
+                                    <a href="{% url 'bids:edit' bid.id %}" class="btn btn-sm btn-outline-warning">
+                                        Modifier
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    {% if request.user.user_type == 'FL' %}
+                    Vous n'avez soumis aucune offre pour le moment.
+                    {% else %}
+                    Vous n'avez reçu aucune offre pour vos projets.
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

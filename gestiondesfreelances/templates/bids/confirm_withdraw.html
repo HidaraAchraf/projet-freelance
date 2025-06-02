@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Retirer l'offre #{{ bid.id }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h2 class="mb-0">Confirmer le retrait de l'offre</h2>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <h5 class="alert-heading">Êtes-vous sûr de vouloir retirer cette offre?</h5>
+                    <p>
+                        Cette action est irréversible. Vous ne pourrez plus modifier cette offre une fois retirée.
+                    </p>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5>Détails de l'offre</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <strong>Projet:</strong> {{ bid.project.title }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Montant:</strong> {{ bid.amount }} €
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Délai:</strong> {{ bid.delivery_time }} jours
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger">Confirmer le retrait</button>
+                        <a href="{% url 'bids:detail' bid.id %}" class="btn btn-outline-secondary">
+                            Annuler
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Accueil{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-light py-5 text-center">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Bienvenue sur Freelance System</h1>
+        <p class="lead text-muted">Connectez-vous avec les meilleurs freelances pour donner vie à vos projets.</p>
+        <a href="{% url 'register' %}" class="btn btn-primary btn-lg me-2">Rejoindre maintenant</a>
+        <a href="{% url 'projects:list' %}" class="btn btn-outline-primary btn-lg">Explorer les projets</a>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-4">
+                <i class="bi bi-search fs-1 text-primary"></i>
+                <h5 class="mt-3">Trouvez des freelances</h5>
+                <p>Accédez à une large base de talents qualifiés dans divers domaines.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-briefcase fs-1 text-primary"></i>
+                <h5 class="mt-3">Proposez vos services</h5>
+                <p>Inscrivez-vous comme freelance et commencez à proposer vos compétences.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-chat-dots fs-1 text-primary"></i>
+                <h5 class="mt-3">Collaborez efficacement</h5>
+                <p>Messagerie intégrée pour faciliter les échanges entre clients et prestataires.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Popular Projects Section -->
+<section class="bg-light py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Projets récents</h2>
+        <div class="row">
+            {% for project in latest_projects %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ project.title }}</h5>
+                            <p class="card-text text-muted">{{ project.description|truncatewords:20 }}</p>
+                        </div>
+                        <div class="card-footer text-end">
+                            <a href="{% url 'projects:detail' project.id %}" class="btn btn-sm btn-primary">Voir le projet</a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-center">Aucun projet disponible pour le moment.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="py-5 text-white text-center bg-primary">
+    <div class="container">
+        <h3>Prêt à démarrer ?</h3>
+        <p>Inscrivez-vous gratuitement et rejoignez notre communauté de freelances et de clients.</p>
+        <a href="{% url 'register' %}" class="btn btn-light btn-lg">Créer un compte</a>
+    </div>
+</section>
+{% endblock %}

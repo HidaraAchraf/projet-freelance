@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Supprimer {{ project.title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h2 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Confirmer la suppression</h2>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <h5 class="alert-heading">Êtes-vous sûr de vouloir supprimer ce projet ?</h5>
+                    <p>
+                        Cette action est irréversible. Toutes les données associées à ce projet 
+                        (y compris les offres et les messages) seront également supprimées.
+                    </p>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5>Détails du projet</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <strong>Titre:</strong> {{ project.title }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Budget:</strong> {{ project.budget }} €
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Délai:</strong> {{ project.deadline|date:"d/m/Y" }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Offres reçues:</strong> {{ project.bids.count }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Confirmer la suppression
+                        </button>
+                        <a href="{% url 'projects:detail' project.id %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle"></i> Annuler
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

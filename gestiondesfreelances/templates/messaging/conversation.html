@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>{{ project.title }}</h1>
+            <span class="badge bg-{% if project.status == 'OP' %}primary{% elif project.status == 'IP' %}warning{% else %}success{% endif %}">
+                {{ project.get_status_display }}
+            </span>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Description du projet</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ project.description|linebreaks }}</p>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Détails</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <strong><i class="bi bi-person"></i> Client:</strong>
+                                {% if project.client %}
+                                    {{ project.client.get_full_name|default:project.client.username }}
+                                {% else %}
+                                    <em>Client inconnu</em>
+                                {% endif %}
+                            </li>
+                            <li class="list-group-item">
+                                <strong><i class="bi bi-cash"></i> Budget:</strong> 
+                                {{ project.budget }} €
+                            </li>
+                            <li class="list-group-item">
+                                <strong><i class="bi bi-calendar"></i> Délai:</strong> 
+                                {{ project.deadline|date:"d/m/Y" }} 
+                                ({{ project.days_remaining }} jours restants)
+                            </li>
+                            <li class="list-group-item">
+                                <strong><i class="bi bi-tags"></i> Compétences:</strong> 
+                                {{ project.skills_required }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">Statistiques</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <strong><i class="bi bi-people"></i> Offres:</strong> 
+                                {{ bids.count }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong><i class="bi bi-clock-history"></i> Créé le:</strong> 
+                                {{ project.created_at|date:"d/m/Y" }}
+                            </li>
+                            {% if project.status != 'OP' %}
+                            <li class="list-group-item">
+                                <strong><i class="bi bi-arrow-repeat"></i> Mis à jour:</strong> 
+                                {{ project.updated_at|date:"d/m/Y" }}
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if project.status == 'OP' and bids %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Offres reçues ({{ bids.count }})</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for bid in bids|slice:":3" %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6>{{ bid.freelancer.get_full_name|default:bid.freelancer.username }}</h6>
+                                <p class="mb-1">{{ bid.proposal|truncatewords:20 }}</p>
+                                <small class="text-muted">
+                                    {{ bid.amount }} € - {{ bid.delivery_time }} jours
+                                </small>
+                            </div>
+                            <a href="{% url 'bids:detail' bid.id %}" class="btn btn-sm btn-outline-primary">
+                                Voir l'offre
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% if bids.count > 3 %}
+                    <div class="list-group-item text-center">
+                        <a href="{% url 'bids:list' %}?project={{ project.id }}" class="btn btn-link">
+                            Voir les {{ bids.count|add:"-3" }} autres offres...
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    {% if user == project.client %}
+                        {% if project.status == 'OP' %}
+                        <a href="{% url 'projects:edit' project.id %}" class="btn btn-outline-primary">
+                            <i class="bi bi-pencil"></i> Modifier le projet
+                        </a>
+                        <a href="{% url 'projects:delete' project.id %}" class="btn btn-outline-danger">
+                            <i class="bi bi-trash"></i> Supprimer le projet
+                        </a>
+                        {% endif %}
+                        <a href="{% if project.id %}{% url 'messaging:new_project_conversation' project.id %}{% else %}#{% endif %}" class="btn btn-outline-info">
+                            <i class="bi bi-envelope"></i> Envoyer un message
+                        </a>
+                    {% elif user.user_type == 'FL' %}
+                        {% if not user_has_bid %}
+                        <a href="{% if project.id %}{% url 'bids:create' project.id %}{% else %}#{% endif %}" class="btn btn-success">
+                            <i class="bi bi-pencil"></i> Soumettre une offre
+                        </a>
+                        {% else %}
+                        <a href="{% if user_bid.id %}{% url 'bids:detail' user_bid.id %}{% else %}#{% endif %}" class="btn btn-outline-primary">
+                            <i class="bi bi-eye"></i> Voir mon offre
+                        </a>
+                        {% endif %}
+                        <a href="{% if project.id %}{% url 'messaging:new_project_conversation' project.id %}{% else %}#{% endif %}" class="btn btn-outline-info">
+                            <i class="bi bi-envelope"></i> Contacter le client
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'projects:list' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Retour aux projets
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {% if user == project.client %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Statut du projet</h5>
+            </div>
+            <div class="card-body">
+                {% if project.status == 'OP' %}
+                <div class="alert alert-info">
+                    <p>Ce projet est ouvert aux offres des freelances.</p>
+                    <p class="mb-0">
+                        <strong>Offres reçues:</strong> {{ bids.count }}
+                    </p>
+                </div>
+                {% elif project.status == 'IP' %}
+                <div class="alert alert-warning">
+                    <p>Ce projet est en cours de réalisation.</p>
+                    {% for bid in accepted_bids %}
+                        <p class="mb-0">
+                            <strong>Freelance:</strong> {{ bid.freelancer.get_full_name|default:bid.freelancer.username }}
+                        </p>
+                    {% empty %}
+                        <p class="mb-0">Aucune offre acceptée pour ce projet.</p>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-success">
+                    <p>Ce projet a été complété avec succès.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

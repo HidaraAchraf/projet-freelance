@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Nouvelle conversation{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">
+                    {% if recipient %}
+                    Nouvelle conversation avec {{ recipient.get_full_name|default:recipient.username }}
+                    {% elif project %}
+                    Nouvelle conversation sur le projet "{{ project.title }}"
+                    {% else %}
+                    Nouvelle conversation
+                    {% endif %}
+                </h2>
+            </div>
+            <div class="card-body">
+                {% if not recipient and not project %}
+                <div class="alert alert-info">
+                    <p>Veuillez sélectionner un destinataire ou un projet pour démarrer une conversation.</p>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'projects:list' %}" class="btn btn-outline-primary">
+                            Par projet
+                        </a>
+                        <a href="#" class="btn btn-outline-primary disabled">
+                            Par utilisateur (bientôt disponible)
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="d-grid gap-2 mt-3">
+                        <button type="submit" class="btn btn-primary">Envoyer le message</button>
+                        <a href="{% url 'messaging:inbox' %}" class="btn btn-outline-secondary">Annuler</a>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

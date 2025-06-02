@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Gérer l'offre #{{ bid.id }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">Gérer l'offre #{{ bid.id }}</h2>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info mb-4">
+                    <h5 class="alert-heading">Détails de l'offre</h5>
+                    <p>
+                        <strong>Freelance:</strong> {{ bid.freelancer.get_full_name|default:bid.freelancer.username }}<br>
+                        <strong>Montant:</strong> {{ bid.amount }} €<br>
+                        <strong>Délai:</strong> {{ bid.delivery_time }} jours
+                    </p>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">Confirmer</button>
+                        <a href="{% url 'bids:detail' bid.id %}" class="btn btn-outline-secondary">
+                            Annuler
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

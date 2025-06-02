@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Soumettre une offre pour {{ project.title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">Soumettre une offre pour "{{ project.title }}"</h2>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h5 class="alert-heading">Détails du projet</h5>
+                    <p>
+                        <strong>Budget client:</strong> {{ project.budget }} €<br>
+                        <strong>Délai:</strong> {{ project.deadline|date:"d/m/Y" }}<br>
+                        <strong>Compétences requises:</strong> {{ project.skills_required }}
+                    </p>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-success">Soumettre l'offre</button>
+                        <a href="{% url 'projects:detail' pk=project.id %}" class="btn btn-outline-secondary">
+                            Annuler
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

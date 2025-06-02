@@ -1,0 +1,49 @@
+# Paquets principaux
+Django==4.2.8
+python-dotenv==1.0.0
+Pillow==10.1.0  # Pour la gestion des images
+
+# Base de données
+mysqlclient==2.2.1  # Pour MySQL (ou psycopg2-binary==2.9.9 pour PostgreSQL)
+
+# Formulaires et UI
+django-crispy-forms==2.1
+crispy-bootstrap5==2023.10
+django-widget-tweaks==1.5.0  # Pour personnaliser les widgets des formulaires
+
+# Système de paiement
+paypalrestsdk==1.13.1  # Pour l'intégration avec PayPal
+stripe==7.0.0  # Alternative à PayPal
+
+# Messagerie et notifications
+channels==4.0.0  # Pour les WebSockets (messagerie en temps réel)
+django-notifications-hq==1.8.2  # Pour le système de notifications
+
+# Authentification et sécurité
+django-allauth==0.58.2  # Pour l'authentification sociale
+django-cors-headers==4.3.1  # Si vous avez une API
+django-axes==6.0.0  # Protection contre les attaques par force brute
+
+# API (optionnel)
+djangorestframework==3.14.0  # Pour construire une API
+drf-yasg==1.21.7  # Documentation Swagger/OpenAPI
+
+# Développement
+black==23.9.1  # Formateur de code
+flake8==6.1.0  # Linter
+python-decouple==3.8  # Gestion des variables d'environnement
+django-debug-toolbar==4.2.0  # Debugging
+ipython==8.17.2  # Shell amélioré
+
+# Production
+gunicorn==21.2.0  # Serveur WSGI pour production
+whitenoise==6.6.0  # Pour servir les fichiers statiques
+django-storages==1.14.0  # Pour stockage cloud (AWS S3, etc.)
+boto3==1.28.65  # Pour AWS S3
+psycopg2-binary==2.9.9  # Pour PostgreSQL en production
+sentry-sdk==1.32.0  # Monitoring des erreurs
+
+# Tâches asynchrones (optionnel)
+celery==5.3.5
+redis==5.0.1  # Broker pour Celery
+django-celery-results==2.5.1

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Modifier l'offre pour {{ project.title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">Modifier l'offre pour "{{ project.title }}"</h2>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <p class="mb-0">
+                        <strong>Statut actuel:</strong> {{ bid.get_status_display }}
+                    </p>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                        <a href="{% url 'bids:withdraw' bid.id %}" class="btn btn-danger">
+                            Retirer l'offre
+                        </a>
+                        <a href="{% url 'projects:detail' project.id %}" class="btn btn-outline-secondary">
+                            Annuler
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

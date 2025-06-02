@@ -1,0 +1,82 @@
+/* Dashboard Cards */
+.card-stat {
+    border-left: 0.25rem solid;
+    transition: transform 0.3s;
+  }
+  
+  .card-stat:hover {
+    transform: translateY(-5px);
+  }
+  
+  .card-stat-primary {
+    border-left-color: var(--primary-color);
+  }
+  
+  .card-stat-success {
+    border-left-color: var(--success-color);
+  }
+  
+  .card-stat-info {
+    border-left-color: var(--info-color);
+  }
+  
+  .card-stat-warning {
+    border-left-color: var(--warning-color);
+  }
+  
+  /* Chart Container */
+  .chart-container {
+    position: relative;
+    height: 300px;
+  }
+  
+  /* Progress Bars */
+  .progress {
+    height: 0.75rem;
+    border-radius: 0.35rem;
+  }
+  
+  .progress-sm {
+    height: 0.5rem;
+  }
+  
+  /* Activity Feed */
+  .activity-feed {
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  .activity-feed-item {
+    position: relative;
+    padding-left: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-left: 1px solid #e3e6f0;
+  }
+  
+  .activity-feed-item:last-child {
+    border-left: 0;
+  }
+  
+  .activity-feed-item::before {
+    content: "";
+    position: absolute;
+    left: -6px;
+    top: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+  }
+  
+  /* Project Status Badges */
+  .badge-status-open {
+    background-color: var(--primary-color);
+  }
+  
+  .badge-status-in-progress {
+    background-color: var(--warning-color);
+  }
+  
+  .badge-status-completed {
+    background-color: var(--success-color);
+  }

@@ -1,0 +1,297 @@
+{% extends 'base.html' %}
+
+{% block title %}Tableau de bord{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- En-tête -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="bi bi-speedometer2"></i> Tableau de bord
+        </h1>
+        {% if user.user_type == 'CL' %}
+        <a href="{% url 'projects:create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Nouveau projet
+        </a>
+        {% endif %}
+    </div>
+    
+    <!-- Cartes de statistiques -->
+    <div class="row">
+        {% if user.user_type == 'FL' %}
+        <!-- Dashboard Freelance -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Projets actifs
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ active_projects.count }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-briefcase fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% else %}
+        <!-- Dashboard Client -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Projets ouverts
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ open_projects.count }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-folder fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Projets en cours
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ active_projects.count }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-hourglass-split fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Projets complétés
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ completed_projects.count }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+            
+        {% endif %}
+    </div>
+    
+    <!-- Contenu principal -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="bi bi-{% if user.user_type == 'FL' %}briefcase{% else %}clipboard{% endif %}"></i>
+                        {% if user.user_type == 'FL' %}Mes projets actifs{% else %}Mes projets récents{% endif %}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if user.user_type == 'FL' %}
+                        {% if active_projects %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Projet</th>
+                                        <th>Client</th>
+                                        <th>Montant</th>
+                                        <th>Délai</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for bid in active_projects %}
+<tr>
+    <td>
+        <a href="{% url 'projects:detail' bid.project.id %}">
+            {{ bid.project.title|truncatechars:30 }}
+        </a>
+    </td>
+    <td>{{ bid.project.client.get_full_name|default:bid.project.client.username }}</td>
+    <td>{{ bid.amount }} €</td>
+    <td>{{ bid.delivery_time }} jours</td>
+    <td>
+        <span class="badge bg-success">
+            {{ bid.get_status_display }}
+        </span>
+    </td>
+    <td>
+        <a href="{% url 'messaging:new_project_conversation' bid.project.id %}" 
+           class="btn btn-sm btn-outline-primary"
+           data-bs-toggle="tooltip" 
+           title="Envoyer un message">
+            <i class="bi bi-envelope"></i>
+        </a>
+        {% if bid.project.status == 'IP' and bid.freelancer == user %}
+            <a href="{% url 'projects:complete_project' bid.project.id %}" 
+               class="btn btn-success btn-sm"
+               data-bs-toggle="tooltip"
+               title="Marquer comme terminé">
+                <i class="bi bi-check2-circle"></i> Terminer
+            </a>
+        {% endif %}
+    </td>
+</tr>
+{% endfor %}
+
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Vous n'avez aucun projet actif pour le moment.
+                        </div>
+                        {% endif %}
+                    {% else %}
+                        {% if active_projects or open_projects or completed_projects %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Titre</th>
+                                        <th>Budget</th>
+                                        <th>Délai</th>
+                                        <th>Statut</th>
+                                        <th>Offres</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for project in active_projects %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'projects:detail' project.id %}">
+                                                {{ project.title|truncatechars:30 }}
+                                            </a>
+                                        </td>
+                                        <td>{{ project.budget }} €</td>
+                                        <td>{{ project.deadline|date:"d/m/Y" }}</td>
+                                        <td>
+                                            <span class="badge bg-warning">
+                                                {{ project.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>{{ project.bids.count }}</td>
+                                        <td>
+                                            <a href="{% url 'projects:detail' project.id %}" 
+                                               class="btn btn-sm btn-outline-primary"
+                                               data-bs-toggle="tooltip" 
+                                               title="Voir détails">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    
+                                    {% for project in open_projects %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'projects:detail' project.id %}">
+                                                {{ project.title|truncatechars:30 }}
+                                            </a>
+                                        </td>
+                                        <td>{{ project.budget }} €</td>
+                                        <td>{{ project.deadline|date:"d/m/Y" }}</td>
+                                        <td>
+                                            <span class="badge bg-primary">
+                                                {{ project.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>{{ project.bids.count }}</td>
+                                        <td>
+                                            <a href="{% url 'projects:detail' project.id %}" 
+                                               class="btn btn-sm btn-outline-primary"
+                                               data-bs-toggle="tooltip" 
+                                               title="Voir détails">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    
+                                    {% for project in completed_projects %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'projects:detail' project.id %}">
+                                                {{ project.title|truncatechars:30 }}
+                                            </a>
+                                        </td>
+                                        <td>{{ project.budget }} €</td>
+                                        <td>{{ project.deadline|date:"d/m/Y" }}</td>
+                                        <td>
+                                            <span class="badge bg-success">
+                                                {{ project.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>{{ project.bids.count }}</td>
+                                        <td>
+                                            <a href="{% url 'projects:detail' project.id %}" 
+                                               class="btn btn-sm btn-outline-primary"
+                                               data-bs-toggle="tooltip" 
+                                               title="Voir détails">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Vous n'avez créé aucun projet pour le moment.
+                            <a href="{% url 'projects:create' %}" class="alert-link">
+                                Créer un nouveau projet
+                            </a>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Activer les tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}

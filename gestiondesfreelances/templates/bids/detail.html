@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Détails de l'offre #{{ bid.id }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">Offre #{{ bid.id }} pour "{{ project.title }}"</h2>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5>Informations sur le freelance</h5>
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <strong>Nom:</strong> {{ bid.freelancer.get_full_name|default:bid.freelancer.username }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Note moyenne:</strong> 
+                                {{ bid.freelancer.freelancer_profile.rating|default:"Non noté" }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Projets réalisés:</strong> 
+                                {{ bid.freelancer.freelancer_profile.completed_projects }}
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Détails de l'offre</h5>
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <strong>Statut:</strong> 
+                                <span class="badge 
+                                    {% if bid.status == 'AC' %}bg-success
+                                    {% elif bid.status == 'PE' %}bg-warning
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ bid.get_status_display }}
+                                </span>
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Montant proposé:</strong> {{ bid.amount }} €
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Délai proposé:</strong> {{ bid.delivery_time }} jours
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Date de soumission:</strong> {{ bid.created_at|date:"d/m/Y H:i" }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Proposition du freelance</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>{{ bid.proposal|linebreaks }}</p>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    {% if can_manage %}
+                    <a href="{% url 'bids:manage' bid.id %}" class="btn btn-primary">
+                        Gérer cette offre
+                    </a>
+                    {% endif %}
+                    
+                    {% if can_edit %}
+                    <a href="{% url 'bids:edit' bid.id %}" class="btn btn-outline-primary">
+                        Modifier l'offre
+                    </a>
+                    {% endif %}
+                    
+                    <a href="{% if request.user == bid.project.client %}
+                    {% url 'projects:detail' pk=project.id %}
+                {% else %}
+                    {% url 'bids:list' %}
+                {% endif %}" 
+          class="btn btn-outline-secondary">
+           Retour
+       </a>
+   </div> <!-- Fin de .d-grid -->
+</div> <!-- Fin de .card-body -->
+</div> <!-- Fin de .card -->
+</div> <!-- Fin de .col-md-8 -->
+</div> <!-- Fin de .row -->
+
+{% endblock %}
